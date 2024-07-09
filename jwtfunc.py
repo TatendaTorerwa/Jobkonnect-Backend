@@ -16,7 +16,7 @@ def generate_token(user_id, username, role):
     Generates a JWT token for a given user.
 
     Args:
-    - user_id (int): The ID of the user.
+    - user_id (int): ID of the user.
     - username (str): The username of the user.
     - role (str): The role of the user.
 
