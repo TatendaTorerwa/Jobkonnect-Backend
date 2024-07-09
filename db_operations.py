@@ -135,22 +135,6 @@ def get_user_by_id(id):
     except NoResultFound:
         return None
 
-#def get_applications_by_user_id(user_id):
-#    """
-#    Retrieve all applications submitted by a specific job seeker.
-
-#    Args:
-#        user_id (int): The ID of the job seeker.
-
-#    Returns:
-#        list: A list of dictionaries representing each application, or None if there's an error.
-#    """
-#    session = SessionLocal()
-#    try:
-#        applications = session.query(Application).filter_by(user_id=user_id).all()
-#        return [app.to_dict() for app in applications]
-#    finally:
-#        session.close()
 
 """Define Job database operations."""
 
