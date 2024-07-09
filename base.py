@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 """Creating the database engine."""
 
 from sqlalchemy import create_engine
