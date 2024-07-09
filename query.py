@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+!/usr/bin/env python3
 
 import mysql.connector
 from config import DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME
