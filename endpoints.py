@@ -100,22 +100,6 @@ def get_user_route(id):
     
     return jsonify(user.to_dict())
 
-#@app.route('/api/user/<int:user_id>/application', methods=['GET'])
-#@token_required
-#def get_user_application(current_user, user_id):
-#   """Retrieve a specific job application associated with a given."""
-#    if current_user['id'] != user_id:
-#        """Check if the current user is authorized to access this endpoint."""
-#        return jsonify({'error': 'Unauthorized access'}), 403
-
-#    """Retrieve the application for the given user_id."""
-#    application = get_application_by_user_id(user_id)
-#    if application:
-#        """If application found, return it with status code 200."""
-#        return jsonify(application), 200
-#    else:
-#        """If no application found, return an error message with status code 404."""
-#        return jsonify({'error': 'No application found'}), 404
 
 """Define routes for Job operations."""
 
