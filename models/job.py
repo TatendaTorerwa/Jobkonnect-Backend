@@ -8,7 +8,7 @@ from base import Base
 from sqlalchemy.sql import func
 
 class Job(Base):
-    """Represents of Job."""
+    """Represents of Job class."""
 
     __tablename__ = 'Jobs'
 
