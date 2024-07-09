@@ -97,7 +97,7 @@ Go to http://localhost:5000/
 
 
 ## Contributing
-- We welcome contributions from the community to improve the JobKonnect_Backend. If you'd like to contribute, please follow these guidelines:
+- We welcome all contributions from the community to improve the JobKonnect_Backend. If you'd like to contribute, please follow these guidelines:
 
 ### Bug Reports and Feature Requests
 - If you encounter any bugs or have ideas for new features, please open an issue on the GitHub repository. When submitting a bug report, please include detailed information about the issue, including steps to reproduce it if possible.
