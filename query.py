@@ -1,9 +1,10 @@
-!/usr/bin/env python3
+#!/usr/bin/env python3
+"""Modify the structure of the Users table in a MySQL database."""
 
 import mysql.connector
 from config import DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME
 
-# Establish a connection to your MySQL database
+"""Establish a connection to your MySQL database."""
 conn = mysql.connector.connect(
     host=DB_HOST,
     user=DB_USERNAME,
@@ -12,7 +13,7 @@ conn = mysql.connector.connect(
 )
 cursor = conn.cursor()
 
-# Define the ALTER TABLE query to add the new columns
+"""Define the ALTER TABLE query to add the new columns."""
 alter_query = """
 ALTER TABLE Users
 ADD COLUMN company_name VARCHAR(100) NOT NULL,
@@ -20,9 +21,9 @@ ADD COLUMN website VARCHAR(255),
 ADD COLUMN contact_info VARCHAR(255)
 """
 
-# Execute the ALTER TABLE query
+"""Execute the ALTER TABLE query."""
 cursor.execute(alter_query)
 
-# Commit the changes and close the connection
+"""Commit the changes and close the connection."""
 conn.commit()
 conn.close()
