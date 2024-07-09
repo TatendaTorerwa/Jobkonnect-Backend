@@ -10,7 +10,7 @@ import bcrypt
 
 
 class User(Base):
-    """Represents of User."""
+    """Represents of User class."""
 
     __tablename__ = 'Users'
 
