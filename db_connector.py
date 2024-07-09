@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+!/usr/bin/env python3
 """Creating the database engine and tables."""
 
 from sqlalchemy import create_engine
