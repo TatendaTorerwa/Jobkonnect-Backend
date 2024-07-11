@@ -289,3 +289,46 @@ def delete_job(job_id):
         session.rollback()
         print(f"Error deleting job {job_id}: {str(e)}")
         return False
+
+def create_application(data):
+    application = Application(
+        id=data['id'],
+        job_id=data['job_id'],
+        employer_id=data['employer_id'],
+        user_id=data['user_id'],
+        name=data['name'],
+        skills=data['skills'],
+        years_of_experience=data['years_of_experience'],
+        resume=data['resume'],
+        cover_letter=data['cover_letter'],
+        email=data['email'],
+        status=data['status']
+    )
+    db.session.add(application)
+    db.session.commit()
+    return application
+
+def get_applications(user_id, role):
+    if role == 'employer':
+        return Application.query.filter_by(employer_id=user_id).all()
+    return Application.query.filter_by(user_id=user_id).all()
+    
+def get_application_by_id(application_id):
+    return Application.query.get(application_id)
+
+def update_application_status(application_id, data):
+    application = get_application_by_id(application_id)
+    if not application:
+        return None
+    if 'status' in data:
+        application.status = data['status']
+    db.session.commit()
+    return application
+
+def delete_application(application_id):
+    application = get_application_by_id(application_id)
+    if not application:
+        return False
+    db.session.delete(application)
+    db.session.commit()
+    return True
