@@ -230,32 +230,20 @@ def get_applications_endpoint(current_user):
 @app.route('/api/application/<int:id>', methods=['GET'])
 @token_required
 def get_application_by_id_endpoint(current_user, id):
-    if current_user['role'] != 'employer':
-        return jsonify({"error": "Only employers can view applications"}), 403
-
     application = get_application_by_id(id)
     if not application:
         return jsonify({"error": "Application not found"}), 404
-
-    # Ensure the employer can only access applications related to their own jobs
-    if application.employer_id != current_user['id']:
+    
+    if current_user['role'] == 'employer' and application.employer_id != current_user['id']:
+        return jsonify({"error": "Unauthorized access to this application"}), 403
+    
+    if current_user['role'] == 'job_seeker' and application.user_id != current_user['id']:
         return jsonify({"error": "Unauthorized access to this application"}), 403
 
     return jsonify(application.to_dict())
 
-@app.route('/api/application/<int:id>', methods=['GET'])
-@token_required
-def get_application_by_id_endpoint(current_user, id):
-    application = get_application_by_id(id)
-    if not application:
-        return jsonify({"error": "Application not found"}), 404
-    if current_user['role'] == 'employer' and application.employer_id != current_user['id']:
-        return jsonify({"error": "Access denied"}), 403
-    if current_user['role'] == 'job_seeker' and application.user_id != current_user['id']:
-        return jsonify({"error": "Access denied"}), 403
-    return jsonify(application.to_dict())
 
-@app.route('/api/application/<int:id>', methods['PUT'])
+@app.route('/api/application/<int:id>', methods=['PUT'])
 @token_required
 def update_application_status_endpoint(current_user, id):
     if current_user['role'] != 'employer':
