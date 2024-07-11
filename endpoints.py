@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Restful api."""
 
-from flask import Flask, jsonify, request
+from flask import Flask, request, jsonify, url_for, send_from_directory
+from werkzeug.utils import secure_filename
+import os
 from flask_cors import CORS
 from jwtfunc import generate_token, token_required
 from db_operations import *
@@ -10,6 +12,12 @@ from db_operations import *
 """Creating an instance of a flask class."""
 app = Flask(__name__)
 CORS(app)
+
+# Configuration for file uploads
+UPLOAD_FOLDER = 'uploads'
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 """Route handler for the root URL."""
@@ -158,6 +166,113 @@ def delete_job_by_id(job_id):
         return jsonify({'message': 'Job listing deleted successfully'}), 200
     else:
         return jsonify({'error': f'Failed to delete job with ID {job_id}'}), 500
+
+@app.route('/api/jobs/<int:id>/apply', methods=['POST'])
+@token_required
+def apply_to_job(current_user, id):
+    if current_user['role'] != 'job_seeker':
+        return jsonify({"error": "Only job_seeker can apply for jobs"}), 403
+
+    job = Job.query.get(id)
+    if not job:
+        return jsonify({"error": "Job not found"}), 404
+
+    data = request.form
+    files = request.files
+
+    application_data = {
+        "id": data.get('id'),
+        "job_id": id,
+        "employer_id": job.employer_id,
+        "user_id": current_user['id'],
+        "name": data.get('name'),
+        "skills": data.get('skills'),
+        "years_of_experience": data.get('years_of_experience'),
+        "email": data.get('email'),
+        "status": data.get('status', 'under_review'),  # Default status to 'under_review'
+    }
+
+    file_resume = files.get('resume')
+    file_cover_letter = files.get('cover_letter')
+
+    if not file_resume or not file_cover_letter:
+        return jsonify({"error": "Resume and cover letter are required"}), 400
+
+    filename_resume = secure_filename(file_resume.filename)
+    filename_cover_letter = secure_filename(file_cover_letter.filename)
+
+    file_resume.save(os.path.join(app.config['UPLOAD_FOLDER'], filename_resume))
+    file_cover_letter.save(os.path.join(app.config['UPLOAD_FOLDER'], filename_cover_letter))
+
+    # Generate URLs for the uploaded files
+    application_data['resume'] = url_for('uploaded_file', filename=filename_resume, _external=True)
+    application_data['cover_letter'] = url_for('uploaded_file', filename=filename_cover_letter, _external=True)
+
+    application = create_application(application_data)
+    return jsonify(application.to_dict()), 201
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+
+@app.route('/api/applications', methods=['GET'])
+@token_required
+def get_applications_endpoint(current_user):
+    if current_user['role'] == 'employer':
+        applications = get_applications(current_user['id'], 'employer')
+    else:
+        applications = get_applications(current_user['id'], 'job_seeker')
+
+    application_dicts = [app.to_dict() for app in applications]
+    return jsonify(application_dicts)
+
+@app.route('/api/application/<int:id>', methods=['GET'])
+@token_required
+def get_application_by_id_endpoint(current_user, id):
+    if current_user['role'] != 'employer':
+        return jsonify({"error": "Only employers can view applications"}), 403
+
+    application = get_application_by_id(id)
+    if not application:
+        return jsonify({"error": "Application not found"}), 404
+
+    # Ensure the employer can only access applications related to their own jobs
+    if application.employer_id != current_user['id']:
+        return jsonify({"error": "Unauthorized access to this application"}), 403
+
+    return jsonify(application.to_dict())
+
+@app.route('/api/application/<int:id>', methods=['GET'])
+@token_required
+def get_application_by_id_endpoint(current_user, id):
+    application = get_application_by_id(id)
+    if not application:
+        return jsonify({"error": "Application not found"}), 404
+    if current_user['role'] == 'employer' and application.employer_id != current_user['id']:
+        return jsonify({"error": "Access denied"}), 403
+    if current_user['role'] == 'job_seeker' and application.user_id != current_user['id']:
+        return jsonify({"error": "Access denied"}), 403
+    return jsonify(application.to_dict())
+
+@app.route('/api/application/<int:id>', methods['PUT'])
+@token_required
+def update_application_status_endpoint(current_user, id):
+    if current_user['role'] != 'employer':
+        return jsonify({"error": "Only employers can update applications"}), 403
+
+    data = request.json
+    application = update_application_status(id, data)
+    return jsonify(application.to_dict()) if application else jsonify({"error": "Application not found"}), 404
+
+@app.route('/api/application/<int:id>', methods=['DELETE'])
+@token_required
+def delete_application_endpoint(current_user, id):
+    if current_user['role'] != 'employer':
+        return jsonify({"error": "Only employers can delete applications"}), 403
+
+    success = delete_application(id)
+    return jsonify({"message": "Application deleted"}) if success else jsonify({"error": "Application not found"}), 404
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)
