@@ -129,8 +129,11 @@ def create_new_job():
     job_id = create_job(data)
     if job_id is not None:
         job_details = get_job_by_id(job_id)
-        """Fetch job details after creation."""
-        return jsonify({'message': 'Job listing created successfully', 'job_details': job_details}), 201
+        if job_details:
+            """Fetch job details after creation."""
+            return jsonify(job_details), 201
+        else:
+            return jsonify({'error': f'Job with ID {job_id} not found after creation'}), 404
     else:
         return jsonify({'error': 'Failed to create job listing'}), 500
 
@@ -153,7 +156,10 @@ def update_job_by_id(job_id):
     if success:
         job_details = get_job_by_id(job_id)
         """Fetch updated job details."""
-        return jsonify({'message': 'Job listing updated successfully', 'job_details': job_details}), 200
+        if job_details:
+            return jsonify(job_details), 200
+        else:
+            return jsonify({'error': f'Job with ID {job_id} not found after update'}), 404
     else:
         return jsonify({'error': f'Failed to update job with ID {job_id}'}), 500
 
