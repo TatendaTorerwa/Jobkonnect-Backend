@@ -290,15 +290,16 @@ def delete_job(job_id):
         print(f"Error deleting job {job_id}: {str(e)}")
         return False
 
+"""Application endpoints."""
+
 def create_application(data):
     application = Application(
-        id=data['id'],
         job_id=data['job_id'],
-        employer_id=data['employer_id'],
         user_id=data['user_id'],
-        name=data['name'],
-        skills=data['skills'],
-        years_of_experience=data['years_of_experience'],
+        first_name=data['first_name'],
+        last_name=data['last_name'],
+        skills_required=data['skills_required'],
+        years_of_experience=data.get('years_of_experience'),
         resume=data['resume'],
         cover_letter=data['cover_letter'],
         email=data['email'],
