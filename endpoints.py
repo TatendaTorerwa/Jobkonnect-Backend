@@ -136,7 +136,7 @@ def create_new_job():
 
 @app.route('/api/jobs', methods=['GET'])
 def get_jobs():
-    """Delete job listing by ID."""
+    """Retrieve all job listings"""
     jobs_list = get_all_jobs()
     if jobs_list is not None:
         return jsonify(jobs_list), 200
@@ -158,6 +158,24 @@ def get_job(job_id):
     else:
         return jsonify({'error': f'Job with ID {job_id} not found'}), 404
 
+@app.route('/api/jobs/employer/<int:employer_id>', methods=['GET'], strict_slashes=False)
+def get_jobs_by_employer(employer_id):
+    """
+    Endpoint to retrieve all jobs posted by a specific employer.
+
+    Args:
+        employer_id (int): The ID of the employer.
+
+    Returns:
+        JSON: A JSON response with a list of jobs, or an error message if failed.
+    """
+    try:
+        jobs = get_jobs_by_employer_id(employer_id)
+        if jobs is None:
+            return jsonify({'error': f'Error retrieving jobs for employer {employer_id}'}), 500
+        return jsonify(jobs), 200
+    except SQLAlchemyError as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/jobs/<int:job_id>', methods=['PUT'])
 def update_job_by_id(job_id):
