@@ -29,7 +29,8 @@ class User(Base):
     website = Column(String(255), nullable=True)
     contact_infor = Column(String(255), nullable=True)
 
-    jobs = relationship('models.job.Job', back_populates='employer')
+    jobs = relationship('Job', back_populates='employer', foreign_keys='Job.employer_id')
+    applications = relationship('Application', back_populates='user', foreign_keys='Application.user_id')
 
     def to_dict(self):
         """Converts the User instance to a dictionary."""

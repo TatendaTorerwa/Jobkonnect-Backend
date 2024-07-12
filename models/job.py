@@ -26,7 +26,9 @@ class Job(Base):
     created_at = Column(TIMESTAMP, nullable=False, server_default=func.now())
     updated_at = Column(TIMESTAMP, nullable=False, server_default=func.now(), onupdate=func.now())
 
-    employer = relationship('models.user.User', back_populates='jobs')
+
+    employer = relationship('User', back_populates='jobs')
+    applications = relationship('Application', back_populates='job')
 
     def to_dict(self):
         """Converts the Job instance to a dictionary."""
