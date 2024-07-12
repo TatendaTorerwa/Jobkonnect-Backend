@@ -173,13 +173,14 @@ def delete_job_by_id(job_id):
     else:
         return jsonify({'error': f'Failed to delete job with ID {job_id}'}), 500
 
+
 @app.route('/api/jobs/<int:id>/apply', methods=['POST'])
 @token_required
 def apply_to_job(current_user, id):
     if current_user['role'] != 'job_seeker':
         return jsonify({"error": "Only job_seeker can apply for jobs"}), 403
 
-    job = Job.query.get(id)
+    job = get_job_by_id(id)
     if not job:
         return jsonify({"error": "Job not found"}), 404
 
@@ -187,13 +188,13 @@ def apply_to_job(current_user, id):
     files = request.files
 
     application_data = {
-        "id": data.get('id'),
         "job_id": id,
-        "employer_id": job.employer_id,
+        "employer_id": job['employer_id'],
         "user_id": current_user['id'],
-        "name": data.get('name'),
-        "skills": data.get('skills'),
-        "years_of_experience": data.get('years_of_experience'),
+        "first_name": data.get('first_name'),
+        "last_name": data.get('last_name'),
+        "skills_required": data.get('skills_required'),
+        "years_of_experience": data.get('years_of_experience'),  # Make this optional
         "email": data.get('email'),
         "status": data.get('status', 'under_review'),  # Default status to 'under_review'
     }
