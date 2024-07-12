@@ -21,7 +21,8 @@ class Application(Base):
     cover_letter = Column(String(255))
     status = Column(Enum('submitted', 'under_review', 'rejected', 'accepted', name='status_enum'), default='submitted')
     submitted_at = Column(TIMESTAMP, nullable=False, server_default=func.now())
-    updated_at = Column(TIMESTAMP, nullable=False, server_default=func.now(), onupdate=func.now())
+    updated_at = Column(TIMESTAMP, nullable=False, server_default=func.now(), onupdate=func.now())i
+    years_of_experience = Column(Integer, nullable=True)
 
     job = relationship('Job', back_populates='applications')
     user = relationship('User', back_populates='applications')
@@ -37,4 +38,5 @@ class Application(Base):
             "status": self.status,
             "submitted_at": self.submitted_at.isoformat(),
             "updated_at": self.updated_at.isoformat()
+            "years_of_experience": self.years_of_experience
         }

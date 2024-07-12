@@ -42,32 +42,33 @@ def generate_token(user_id, username, role):
 
     return token, expiration.isoformat()
 
-
 def token_required(f):
     """
     Decorator function to authenticate user based on JWT token.
 
     Args:
-    - route_function (function): The route function to be decorated.
+    - f (function): The route function to be decorated.
 
     Returns:
     - function: Decorated route function.
 
-    Raises:
-    - None
-
     This decorator function checks the 'Authorization' header in the request for a valid
-    JWT token. If the token is valid, it extracts the user information and passes it to
+    JWT token in Bearer format. If the token is valid, it extracts the user information and passes it to
     the decorated route function. If the token is invalid or missing, it returns a 401
     Unauthorized response.
     """
     @wraps(f)
     def decorated(*args, **kwargs):
-        token = None
-        if 'x-access-token' in request.headers:
-            token = request.headers['x-access-token']
-        if not token:
-            return jsonify({'message': 'Token is missing!'}), 401
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'message': 'Authorization header is missing!'}), 401
+
+        parts = auth_header.split()
+        if len(parts) != 2 or parts[0].lower() != 'bearer':
+            return jsonify({'message': 'Invalid token format!'}), 401
+        
+        token = parts[1]
+
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])  # Correctly reference the secret key
             current_user = {
@@ -79,5 +80,7 @@ def token_required(f):
             return jsonify({'message': 'Token has expired!'}), 401
         except jwt.InvalidTokenError:
             return jsonify({'message': 'Invalid token!'}), 401
+
         return f(current_user, *args, **kwargs)
+
     return decorated
