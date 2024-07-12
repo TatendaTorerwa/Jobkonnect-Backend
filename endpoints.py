@@ -13,11 +13,12 @@ from db_operations import *
 app = Flask(__name__)
 CORS(app)
 
-# Configuration for file uploads
+"""Configuration for file uploads"""
 UPLOAD_FOLDER = 'uploads'
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['ALLOWED_EXTENSIONS'] = {'pdf', 'docx'}
 
 
 """Route handler for the root URL."""
@@ -108,19 +109,14 @@ def get_user_route(id):
     
     return jsonify(user.to_dict())
 
+@app.route('/api/users', methods=['GET'], strict_slashes=False)
+def get_all_users_route():
+    """Implement logic to retrieve all users."""
+    users = get_all_users()
+    return jsonify(users)
+
 
 """Define routes for Job operations."""
-
-
-@app.route('/api/jobs', methods=['GET'])
-def get_jobs():
-    """Delete job listing by ID."""
-    jobs_list = get_all_jobs()
-    if jobs_list is not None:
-        return jsonify(jobs_list), 200
-    else:
-        return jsonify({'error': 'Failed to retrieve jobs'}), 500
-
 
 @app.route('/api/jobs', methods=['POST'])
 def create_new_job():
@@ -137,6 +133,21 @@ def create_new_job():
     else:
         return jsonify({'error': 'Failed to create job listing'}), 500
 
+
+@app.route('/api/jobs', methods=['GET'])
+def get_jobs():
+    """Delete job listing by ID."""
+    jobs_list = get_all_jobs()
+    if jobs_list is not None:
+        return jsonify(jobs_list), 200
+    else:
+        return jsonify({'error': 'Failed to retrieve jobs'}), 500
+
+
+
+        return jsonify({'error': 'Failed to create job listing'}), 500
+        return jsonify({'error': 'Failed to create job listing'}), 500
+        return jsonify({'error': 'Failed to create job listing'}), 500
 
 @app.route('/api/jobs/<int:job_id>', methods=['GET'])
 def get_job(job_id):
@@ -189,14 +200,9 @@ def apply_to_job(current_user, id):
 
     application_data = {
         "job_id": id,
-        "employer_id": job['employer_id'],
         "user_id": current_user['id'],
-        "first_name": data.get('first_name'),
-        "last_name": data.get('last_name'),
-        "skills_required": data.get('skills_required'),
-        "years_of_experience": data.get('years_of_experience'),  # Make this optional
-        "email": data.get('email'),
-        "status": data.get('status', 'under_review'),  # Default status to 'under_review'
+        "years_of_experience": data.get('years_of_experience'),
+        "status": data.get('status', 'submitted'),  # Default status to submitted'
     }
 
     file_resume = files.get('resume')
@@ -211,7 +217,7 @@ def apply_to_job(current_user, id):
     file_resume.save(os.path.join(app.config['UPLOAD_FOLDER'], filename_resume))
     file_cover_letter.save(os.path.join(app.config['UPLOAD_FOLDER'], filename_cover_letter))
 
-    # Generate URLs for the uploaded files
+    """Generate URLs for the uploaded files"""
     application_data['resume'] = url_for('uploaded_file', filename=filename_resume, _external=True)
     application_data['cover_letter'] = url_for('uploaded_file', filename=filename_cover_letter, _external=True)
 

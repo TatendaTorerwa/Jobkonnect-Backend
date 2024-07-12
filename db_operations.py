@@ -8,7 +8,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from base import SessionLocal
 from models.user import User
 from models.job import Job
-#from models.application import Application
+from models.application import Application
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 
@@ -134,6 +134,12 @@ def get_user_by_id(id):
         return user
     except NoResultFound:
         return None
+
+def get_all_users():
+    """Retrieve all users from the database."""
+    session = SessionLocal()
+    users = session.query(User).all()
+    return [user.to_dict() for user in users]
 
 
 """Define Job database operations."""
@@ -296,26 +302,35 @@ def create_application(data):
     application = Application(
         job_id=data['job_id'],
         user_id=data['user_id'],
-        first_name=data['first_name'],
-        last_name=data['last_name'],
-        skills_required=data['skills_required'],
         years_of_experience=data.get('years_of_experience'),
         resume=data['resume'],
         cover_letter=data['cover_letter'],
-        email=data['email'],
         status=data['status']
     )
-    db.session.add(application)
-    db.session.commit()
+    session = SessionLocal()
+    session.add(application)
+    session.commit()
     return application
 
 def get_applications(user_id, role):
-    if role == 'employer':
-        return Application.query.filter_by(employer_id=user_id).all()
-    return Application.query.filter_by(user_id=user_id).all()
+    session = SessionLocal()
+    try:
+        if role == 'employer':
+            return session.query(Application).filter_by(employer_id=user_id).all()
+        return session.query(Application).filter_by(user_id=user_id).all()
+    except Exception as e:
+        raise e
+    finally:
+        session.close()
     
 def get_application_by_id(application_id):
-    return Application.query.get(application_id)
+    session = SessionLocal()
+    try:
+        return session.query(Application).get(application_id)
+    except Exception as e:
+        raise e
+    finally:
+        session.close()
 
 def update_application_status(application_id, data):
     application = get_application_by_id(application_id)
@@ -323,13 +338,15 @@ def update_application_status(application_id, data):
         return None
     if 'status' in data:
         application.status = data['status']
-    db.session.commit()
+    session = SessionLocal()
+    session.commit()
     return application
 
 def delete_application(application_id):
     application = get_application_by_id(application_id)
     if not application:
         return False
-    db.session.delete(application)
-    db.session.commit()
+    session = SessionLocal()
+    session.delete(application)
+    session.commit()
     return True
