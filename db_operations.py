@@ -313,7 +313,11 @@ def create_application(data):
         years_of_experience=data.get('years_of_experience'),
         resume=data['resume'],
         cover_letter=data['cover_letter'],
-        status=data['status']
+        status=data['status'],
+        name=data['name'],
+        school_name=data['school_name'],
+        portfolio=data['portfolio'],
+        skills=data['skills']
     )
     session.add(application)
     session.commit()

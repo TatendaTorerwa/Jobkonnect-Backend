@@ -220,7 +220,11 @@ def apply_to_job(current_user, id):
         "user_id": current_user['id'],
         "years_of_experience": data.get('years_of_experience'),
         "status": data.get('status', 'submitted'),
-        "employer_id": job.get('employer_id')
+        "employer_id": job.get('employer_id'),
+        "name": data.get('name'),
+        "school_name": data.get('school_name'),
+        "portfolio": data.get('portfolio'),
+        "skills": data.get('skills')
     }
 
     file_resume = files.get('resume')

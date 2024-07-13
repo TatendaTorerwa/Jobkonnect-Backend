@@ -25,7 +25,6 @@ class Application(Base):
     updated_at = Column(TIMESTAMP, nullable=False, server_default=func.now(), onupdate=func.now())
     years_of_experience = Column(Integer, nullable=True)
     name = Column(String(100), nullable=False)
-    highest_education = Column(Enum('High School', 'Bachelor', 'Master', 'PhD', name='education_enum'), nullable=False)
     school_name = Column(String(100), nullable=False)
     portfolio = Column(String(255), nullable=False)
     skills = Column(String(255), nullable=False)
@@ -48,7 +47,6 @@ class Application(Base):
             "updated_at": self.updated_at.isoformat(),
             "years_of_experience": self.years_of_experience,
             "name": self.name,
-            "highest_education": self.highest_education,
             "school_name": self.school_name,
             "portfolio": self.portfolio,
             "skills": self.skills
