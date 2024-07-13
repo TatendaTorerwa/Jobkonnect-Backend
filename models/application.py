@@ -24,6 +24,11 @@ class Application(Base):
     submitted_at = Column(TIMESTAMP, nullable=False, server_default=func.now())
     updated_at = Column(TIMESTAMP, nullable=False, server_default=func.now(), onupdate=func.now())
     years_of_experience = Column(Integer, nullable=True)
+    name = Column(String(100), nullable=False)
+    highest_education = Column(Enum('High School', 'Bachelor', 'Master', 'PhD', name='education_enum'), nullable=False)
+    school_name = Column(String(100), nullable=False)
+    portfolio = Column(String(255), nullable=False)
+    skills = Column(String(255), nullable=False)
 
     job = relationship('Job', back_populates='applications')
     user = relationship('User', foreign_keys=[user_id], back_populates='applications')
@@ -34,11 +39,17 @@ class Application(Base):
         return {
             "id": self.id,
             "job_id": self.job_id,
+            "employer_id": self.employer_id,
             "user_id": self.user_id,
             "resume": self.resume,
             "cover_letter": self.cover_letter,
             "status": self.status,
             "submitted_at": self.submitted_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
-            "years_of_experience": self.years_of_experience
+            "years_of_experience": self.years_of_experience,
+            "name": self.name,
+            "highest_education": self.highest_education,
+            "school_name": self.school_name,
+            "portfolio": self.portfolio,
+            "skills": self.skills
         }
