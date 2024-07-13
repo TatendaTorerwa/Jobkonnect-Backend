@@ -207,6 +207,7 @@ def delete_job_by_id(job_id):
 def apply_to_job(current_user, id):
     if current_user['role'] != 'job_seeker':
         return jsonify({"error": "Only job_seeker can apply for jobs"}), 403
+
     job = get_job_by_id(id)
     if not job:
         return jsonify({"error": "Job not found"}), 404
@@ -238,8 +239,12 @@ def apply_to_job(current_user, id):
     application_data['resume'] = url_for('uploaded_file', filename=filename_resume, _external=True)
     application_data['cover_letter'] = url_for('uploaded_file', filename=filename_cover_letter, _external=True)
 
-    application = create_application(application_data)
-    return jsonify(application.to_dict()), 201
+    try:
+        application = create_application(application_data)
+        return jsonify(application.to_dict()), 201
+    except ValueError as ve:
+        return jsonify({"error": str(ve)}), 400
+
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):

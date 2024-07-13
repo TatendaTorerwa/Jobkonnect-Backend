@@ -299,15 +299,22 @@ def delete_job(job_id):
 """Application endpoints."""
 
 def create_application(data):
+    session = SessionLocal()
+
+    # Check if the user has already applied for this job
+    existing_application = session.query(Application).filter_by(user_id=data['user_id'], job_id=data['job_id']).first()
+    if existing_application:
+        raise ValueError("You have already applied for this job")
+
     application = Application(
         job_id=data['job_id'],
+        employer_id=data['employer_id'],
         user_id=data['user_id'],
         years_of_experience=data.get('years_of_experience'),
         resume=data['resume'],
         cover_letter=data['cover_letter'],
         status=data['status']
     )
-    session = SessionLocal()
     session.add(application)
     session.commit()
     return application
