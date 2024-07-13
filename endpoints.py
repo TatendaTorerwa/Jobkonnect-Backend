@@ -92,9 +92,8 @@ def login():
         token, expiration = generate_token(user.id, user.username, user.role)
         print(f"Token: {token}, Expiration: {expiration}")
         return jsonify({
-            'user_id': user.id,
+            'user': user.to_dict(),
             'token': token,
-            'role': user.role,
             'token_expiration': expiration
         })
     return jsonify({'message': 'Invalid credentials'}), 401
@@ -208,11 +207,10 @@ def delete_job_by_id(job_id):
 def apply_to_job(current_user, id):
     if current_user['role'] != 'job_seeker':
         return jsonify({"error": "Only job_seeker can apply for jobs"}), 403
-
     job = get_job_by_id(id)
     if not job:
         return jsonify({"error": "Job not found"}), 404
-
+    
     data = request.form
     files = request.files
 
@@ -220,7 +218,8 @@ def apply_to_job(current_user, id):
         "job_id": id,
         "user_id": current_user['id'],
         "years_of_experience": data.get('years_of_experience'),
-        "status": data.get('status', 'submitted'),  # Default status to submitted'
+        "status": data.get('status', 'submitted'),
+        "employer_id": job.get('employer_id')
     }
 
     file_resume = files.get('resume')
