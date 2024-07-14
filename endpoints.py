@@ -37,6 +37,10 @@ def register():
     """
     Endpoint for the user registration.
     """
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+
     """Extract data from JSON request."""
     data = request.get_json()
     username = data.get('username')
@@ -50,6 +54,10 @@ def register():
     company_name = data.get('company_name', None)
     website = data.get('website', None)
     contact_infor= data.get('contact_infor', None)
+     
+    if not username or not password or not email or not role or not phone_number or not address:
+        """Missing required fields during registration."""
+        return jsonify({'error': 'Missing required fields'}), 400
 
     """Validate required fields based on role."""
     if role == 'job_seeker' and (not first_name or not last_name):
@@ -62,13 +70,21 @@ def register():
         register_user(username, password, email, role, phone_number, address,
                       first_name=first_name, last_name=last_name,
                       company_name=company_name, website=website, contact_infor=contact_infor)
-
+    
         return jsonify({'message': 'User registered successfully'}), 201
+
     except ValueError as ve:
-        return jsonify({'error': str(ve)}), 400
+        return jsonify({'error': f'Registration failed: {str(ve)}'}), 400
+
+    except IntegrityError as e:
+        if "Duplicate entry" in str(e):
+            error_message = "Sorry, the username is already taken. Please choose a different username."
+        else:
+            error_message = "An error occurred during user registration. Please try again later."
+
     except SQLAlchemyError as se:
         return jsonify({'error': f'Failed to register user: {str(se)}'}), 500
-    
+
 
 @app.route('/api/user/login', methods=['POST'], strict_slashes=False)
 def login():
@@ -96,7 +112,7 @@ def login():
             'token': token,
             'token_expiration': expiration
         })
-    return jsonify({'message': 'Invalid credentials'}), 401
+    return jsonify({'error': 'Invalid email or password'}), 401
 
 
 @app.route('/api/user/<int:id>', methods=['GET'], strict_slashes=False)
