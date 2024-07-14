@@ -358,6 +358,18 @@ def apply_to_job(current_user, id):
         return jsonify({"error": str(ve)}), 400
 
 
+"""Route to uploaded_file."""
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    """
+    Serve a file from the upload directory.
+
+    :param filename: The name of the file to be served.
+    :return: The file located in the UPLOAD_FOLDER with the specified filename.
+    """
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+
 """Route to get all applications for the current user."""
 @app.route('/api/applications', methods=['GET'])
 @token_required

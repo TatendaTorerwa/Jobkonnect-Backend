@@ -358,7 +358,7 @@ def delete_job(job_id):
 
 
 def create_application(data):
-     """
+    """
     Create a new application for a job in the database.
 
     Args:
@@ -421,7 +421,7 @@ def get_applications(user_id, role):
     
 
 def get_application_by_id(application_id):
-     """
+    """
     Retrieve an application by its ID from the database (restricted to employers).
 
     Args:
