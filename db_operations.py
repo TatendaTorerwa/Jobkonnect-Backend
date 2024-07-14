@@ -4,7 +4,7 @@ Database operations.
 """
 
 from flask import jsonify
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from base import SessionLocal
 from models.user import User
 from models.job import Job
