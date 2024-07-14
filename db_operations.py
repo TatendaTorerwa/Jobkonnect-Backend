@@ -1,6 +1,63 @@
 #!/usr/bin/env python3
 """
-Database operations.
+Database operations module for handling user, job, and application interactions.
+
+This module contains functions for registering users, managing jobs, and handling job applications
+using SQLAlchemy ORM for database operations.
+
+Modules imported:
+- flask.jsonify: For converting Python dictionaries to JSON responses.
+- sqlalchemy.exc.SQLAlchemyError, sqlalchemy.exc.IntegrityError: Exception classes for database errors.
+- base.SessionLocal: Provides a local session for database operations.
+- models.user.User, models.job.Job, models.application.Application: SQLAlchemy model classes for User, Job, and Application entities.
+- sqlalchemy.orm.exc.NoResultFound, sqlalchemy.orm.exc.MultipleResultsFound: Exceptions raised when querying with SQLAlchemy ORM.
+
+Functions:
+- register_user(username, password, email, role, phone_number, address, first_name=None, last_name=None,
+                company_name=None, website=None, contact_info=None):
+  Registers a new user in the database with provided details.
+
+- login_user(email, password):
+  Retrieves a user from the database by email and verifies the password.
+
+- get_user_by_id(id):
+  Retrieves a user from the database by their ID.
+
+- get_all_users():
+  Retrieves all users from the database.
+
+- get_all_jobs():
+  Retrieves all jobs from the database.
+
+- create_job(data):
+  Creates a new job in the database with provided details.
+
+- get_job_by_id(job_id):
+  Retrieves a job from the database by its ID.
+
+- get_jobs_by_employer_id(employer_id):
+  Retrieves all jobs posted by a specific employer.
+
+- update_job(job_id, data):
+  Updates a job in the database with provided data.
+
+- delete_job(job_id):
+  Deletes a job from the database by its ID.
+
+- create_application(data):
+  Creates a new job application in the database with provided data.
+
+- get_applications(user_id, role):
+  Retrieves applications based on user ID and role (employer or job seeker).
+
+- get_application_by_id(application_id):
+  Retrieves a job application from the database by its ID.
+
+- update_application_status(application_id, data):
+  Updates the status of a job application in the database (restricted to employers).
+
+- delete_application(application_id):
+  Deletes a job application from the database by its ID.
 """
 
 from flask import jsonify
@@ -11,10 +68,6 @@ from models.job import Job
 from models.application import Application
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
-
-
-
-user = User()
 
 """user database operations"""
 
@@ -113,6 +166,7 @@ def login_user(email, password):
         return None
     except SQLAlchemyError:
         return None
+
  
 def get_user_by_id(id):
     """
@@ -143,6 +197,7 @@ def get_all_users():
 
 
 """Define Job database operations."""
+
 
 def get_all_jobs():
     """
@@ -216,6 +271,7 @@ def get_job_by_id(job_id):
         print(f"Error retrieving job {job_id}: {str(e)}")
         return None
 
+
 def get_jobs_by_employer_id(employer_id):
     """
     Retrieve all jobs posted by a specific employer.
@@ -271,6 +327,7 @@ def update_job(job_id, data):
         print(f"Error updating job {job_id}: {str(e)}")
         return False
 
+
 def delete_job(job_id):
     """
     Delete a job from the database.
@@ -296,12 +353,26 @@ def delete_job(job_id):
         print(f"Error deleting job {job_id}: {str(e)}")
         return False
 
+
 """Application endpoints."""
 
+
 def create_application(data):
+     """
+    Create a new application for a job in the database.
+
+    Args:
+    - data (dict): A dictionary containing application details.
+
+    Returns:
+    - Application: The created application object if successful.
+    
+    Raises:
+    - ValueError: If the user has already applied for the job.
+    """
     session = SessionLocal()
 
-    # Check if the user has already applied for this job
+    """Check if the user has already applied for this job."""
     existing_application = session.query(Application).filter_by(user_id=data['user_id'], job_id=data['job_id']).first()
     if existing_application:
         raise ValueError("You have already applied for this job")
@@ -323,7 +394,21 @@ def create_application(data):
     session.commit()
     return application
 
+
 def get_applications(user_id, role):
+    """
+    Retrieve applications based on user ID and role.
+
+    Args:
+    - user_id (int): The ID of the user whose applications to retrieve.
+    - role (str): The role of the user ('employer' or 'job_seeker').
+
+    Returns:
+    - list: A list of Application objects filtered by user ID and role, or an empty list if no applications found.
+    
+    Raises:
+    - Exception: Any exception raised during database query.
+    """
     session = SessionLocal()
     try:
         if role == 'employer':
@@ -334,7 +419,20 @@ def get_applications(user_id, role):
     finally:
         session.close()
     
+
 def get_application_by_id(application_id):
+     """
+    Retrieve an application by its ID from the database (restricted to employers).
+
+    Args:
+    - application_id (int): The ID of the application to retrieve.
+
+    Returns:
+    - Application: The Application object if found, None if no application found.
+    
+    Raises:
+    - Exception: Any exception raised during database query.
+    """
     session = SessionLocal()
     try:
         return session.query(Application).get(application_id)
@@ -343,7 +441,18 @@ def get_application_by_id(application_id):
     finally:
         session.close()
 
+
 def update_application_status(application_id, data):
+    """
+    Update the status of an application in the database (restricted to employers).
+
+    Args:
+    - application_id (int): The ID of the application to update.
+    - data (dict): A dictionary containing the updated status.
+
+    Returns:
+    - Application: The updated Application object if successful, None if application not found.
+    """
     application = get_application_by_id(application_id)
     if not application:
         return None
@@ -353,7 +462,20 @@ def update_application_status(application_id, data):
     session.commit()
     return application
 
+
 def delete_application(application_id):
+    """
+    Delete an application from the database (restricted to employers).
+
+    Args:
+    - application_id (int): The ID of the application to delete.
+
+    Returns:
+    - bool: True if the application was successfully deleted, False otherwise.
+    
+    Raises:
+    - Exception: Any exception raised during database query or commit.
+    """
     application = get_application_by_id(application_id)
     if not application:
         return False
