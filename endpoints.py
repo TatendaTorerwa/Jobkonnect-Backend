@@ -67,7 +67,7 @@ def register():
     contact_infor= data.get('contact_infor', None)
 
     """Validate required fields"""     
-    if not username or not password or not email or not role or not phone_number or not address:
+    if not username or not password or not email or not role or not phone_number:
         """Missing required fields during registration."""
         return jsonify({'error': 'Missing required fields'}), 400
 
