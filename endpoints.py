@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Restful api."""
 
+"""Import necessary modules"""
 from flask import Flask, request, jsonify, url_for, send_from_directory
 from werkzeug.utils import secure_filename
 import os
@@ -11,6 +12,7 @@ from db_operations import *
 
 """Creating an instance of a flask class."""
 app = Flask(__name__)
+"""Enable CORS for all routes"""
 CORS(app)
 
 """Configuration for file uploads"""
@@ -26,16 +28,25 @@ app.config['ALLOWED_EXTENSIONS'] = {'pdf', 'docx'}
 def index():
     """
     Endpoint for the root url.
+
+    Returns:
+        JSON: A welcome message.
+
     """
     return jsonify({'message': 'Welcome to JobKonnect.'})
 
+
 """Define routes for user operations."""
 
-
+"""Routes for user registration."""
 @app.route('/api/user/register', methods=['POST'], strict_slashes=False)
 def register():
     """
     Endpoint for the user registration.
+
+    Returns:
+        JSON: Success or error message.
+
     """
     data = request.get_json()
     if not data:
@@ -54,7 +65,8 @@ def register():
     company_name = data.get('company_name', None)
     website = data.get('website', None)
     contact_infor= data.get('contact_infor', None)
-     
+
+    """Validate required fields"""     
     if not username or not password or not email or not role or not phone_number or not address:
         """Missing required fields during registration."""
         return jsonify({'error': 'Missing required fields'}), 400
@@ -86,10 +98,15 @@ def register():
         return jsonify({'error': f'Failed to register user: {str(se)}'}), 500
 
 
+"""Route for user login"""
 @app.route('/api/user/login', methods=['POST'], strict_slashes=False)
 def login():
     """
     Endpoint for the user login.
+
+    Returns:
+        JSON: User details and authentication token.
+
     """
     data = request.get_json()
     if not data:
@@ -115,27 +132,53 @@ def login():
     return jsonify({'error': 'Invalid email or password'}), 401
 
 
+"""Route to get user by ID"""
 @app.route('/api/user/<int:id>', methods=['GET'], strict_slashes=False)
 def get_user_route(id):
-    """Implement logic to get user by id."""
+    """
+    Endpoint logic to get user by id.
+
+    Args:
+        id(int): The ID of the user to retrieve.
+
+    Returns:
+        JSON: User details or error message if the user is not found.
+
+    """
     user = get_user_by_id(id)
     if not user:
         return jsonify({'error': 'User not found'}), 404
     
     return jsonify(user.to_dict())
 
+
+"""Route to get all users"""
 @app.route('/api/users', methods=['GET'], strict_slashes=False)
 def get_all_users_route():
-    """Implement logic to retrieve all users."""
+    """
+    Endpoint to retrieve all users.
+
+    Returns:
+        JSON: A list of all users.
+
+    """
     users = get_all_users()
     return jsonify(users)
 
 
 """Define routes for Job operations."""
 
+
+"""Route to create a new job listings"""
 @app.route('/api/jobs', methods=['POST'])
 def create_new_job():
-    """Create a new job listing."""
+    """
+    Endpoint to create a new job listing.
+
+    Returns:
+        JSON: Newly created job details or error message.
+
+    """
     data = request.get_json()
     job_id = create_job(data)
     if job_id is not None:
@@ -149,9 +192,16 @@ def create_new_job():
         return jsonify({'error': 'Failed to create job listing'}), 500
 
 
+"""Route to retrieve all job listings"""
 @app.route('/api/jobs', methods=['GET'])
 def get_jobs():
-    """Retrieve all job listings"""
+    """
+    Endpoint to retrieve all job listings
+
+    Returns:
+        JSON: A list of all job listings.
+
+    """
     jobs_list = get_all_jobs()
     if jobs_list is not None:
         return jsonify(jobs_list), 200
@@ -159,20 +209,27 @@ def get_jobs():
         return jsonify({'error': 'Failed to retrieve jobs'}), 500
 
 
-
-        return jsonify({'error': 'Failed to create job listing'}), 500
-        return jsonify({'error': 'Failed to create job listing'}), 500
-        return jsonify({'error': 'Failed to create job listing'}), 500
-
+"""Route to retrieve job details by ID."""
 @app.route('/api/jobs/<int:job_id>', methods=['GET'])
 def get_job(job_id):
-    """Retrieve job details by ID."""
+    """
+    Endpoint to retrieve job details by ID.
+
+    Args:
+        job_id(int): The ID of the job to retrieve.
+
+    Returns:
+        JSON: Job details or error message if job not found.
+
+    """
     job_details = get_job_by_id(job_id)
     if job_details:
         return jsonify(job_details), 200
     else:
         return jsonify({'error': f'Job with ID {job_id} not found'}), 404
 
+
+"""Route to reyrieve jobs by employer ID."""
 @app.route('/api/jobs/employer/<int:employer_id>', methods=['GET'], strict_slashes=False)
 def get_jobs_by_employer(employer_id):
     """
@@ -192,9 +249,20 @@ def get_jobs_by_employer(employer_id):
     except SQLAlchemyError as e:
         return jsonify({'error': str(e)}), 500
 
+
+"""Route to update job listing by ID."""
 @app.route('/api/jobs/<int:job_id>', methods=['PUT'])
 def update_job_by_id(job_id):
-    """Update job listing by ID."""
+    """
+    Endpoint to update job listing by ID.
+
+    Args:
+        job_id(int): The ID of the job to update.
+
+    Returns:
+        JSON: Updated job details or error message if update failed.
+
+    """
     data = request.get_json()
     success = update_job(job_id, data)
     if success:
@@ -208,19 +276,43 @@ def update_job_by_id(job_id):
         return jsonify({'error': f'Failed to update job with ID {job_id}'}), 500
 
 
+"""Route to delete job listings by ID."""
 @app.route('/api/jobs/<int:job_id>', methods=['DELETE'])
 def delete_job_by_id(job_id):
-    """Delete job listing by ID."""
+    """
+    Endpoint to delete job listing by ID.
+
+    Args:
+        job_id(int): The ID of the job to delete.
+
+    Returns:
+        JSON: Success message or error message if deletion failed.
+
+    """
     success = delete_job(job_id)
     if success:
         return jsonify({'message': 'Job listing deleted successfully'}), 200
     else:
         return jsonify({'error': f'Failed to delete job with ID {job_id}'}), 500
 
+"""Define routes for Application operations."""
 
+
+"""Route to apply to a job."""
 @app.route('/api/jobs/<int:id>/apply', methods=['POST'])
 @token_required
 def apply_to_job(current_user, id):
+    """
+    Endpoint to apply to a job.
+
+    Args:
+        current_user (dict): The authenticated user's information.
+        id (int): The ID of the job to apply to.
+
+    Returns:
+        JSON: Application details or the error message if application failed.
+    """
+    
     if current_user['role'] != 'job_seeker':
         return jsonify({"error": "Only job_seeker can apply for jobs"}), 403
 
@@ -266,14 +358,19 @@ def apply_to_job(current_user, id):
         return jsonify({"error": str(ve)}), 400
 
 
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
-
-
+"""Route to get all applications for the current user."""
 @app.route('/api/applications', methods=['GET'])
 @token_required
 def get_applications_endpoint(current_user):
+    """
+    Endpoint to retrieve applications based on user role.
+
+    Args:
+        current_user (dict): The authenticated user's information.
+
+    Returns:
+        JSON: A list of applications or an error message if retrieval failed.
+    """
     if current_user['role'] == 'employer':
         applications = get_applications(current_user['id'], 'employer')
     else:
@@ -282,9 +379,21 @@ def get_applications_endpoint(current_user):
     application_dicts = [app.to_dict() for app in applications]
     return jsonify(application_dicts)
 
+
+""" Route to get a specific application by ID."""
 @app.route('/api/application/<int:id>', methods=['GET'])
 @token_required
 def get_application_by_id_endpoint(current_user, id):
+    """
+    Endpoint to retrieve a specific application by ID.
+    
+    Args:
+        current_user (dict): The authenticated user's information.
+        id (int): The ID of the application to retrieve.
+
+    Returns:
+        JSON: Application details or an error message if application not found or un authorized.
+    """
     application = get_application_by_id(id)
     if not application:
         return jsonify({"error": "Application not found"}), 404
@@ -298,9 +407,20 @@ def get_application_by_id_endpoint(current_user, id):
     return jsonify(application.to_dict())
 
 
+"""Route to update the status of a specific application by ID."""
 @app.route('/api/application/<int:id>', methods=['PUT'])
 @token_required
 def update_application_status_endpoint(current_user, id):
+    """
+    Endpoint to update the status of a specific application by ID.
+
+    Args:
+        current_user (dict): The authenticated user's information.
+        id (int): The ID of the application to update.
+
+    Returns:
+        JSON: Updated application details or an error message if update failed or application not found.
+    """
     if current_user['role'] != 'employer':
         return jsonify({"error": "Only employers can update applications"}), 403
 
@@ -308,9 +428,21 @@ def update_application_status_endpoint(current_user, id):
     application = update_application_status(id, data)
     return jsonify(application.to_dict()) if application else jsonify({"error": "Application not found"}), 404
 
+
+"""Route to delete a specific application by ID."""
 @app.route('/api/application/<int:id>', methods=['DELETE'])
 @token_required
 def delete_application_endpoint(current_user, id):
+    """
+    Endpoint to delete a specific application by ID.
+
+    Args:
+        current_user (dict): The authenticated user's information.
+        id (int): The ID of teh application to delete.
+
+    Returns:
+        JSON: Success message or an error message if deleteion failed or application not found.
+    """
     if current_user['role'] != 'employer':
         return jsonify({"error": "Only employers can delete applications"}), 403
 
