@@ -2,7 +2,6 @@
 
 - The JobKonnect project aims to solve the issue of connecting tech talent with tech job opportunities efficiently. Current job boards are often cluttered with non-tech jobs, making it difficult for tech professionals to find relevant opportunities.
 
-![JobKonnect Logo](https://raw.githubusercontent.com/TatendaTorerwa/Jobkonnect-backend/09bb0455aaadc4ad9b58f4f0f94af9f070abec19/jobkonnect1.PNG)
 
 ## Team
 - Tatenda Torerwa - Backend Developer
