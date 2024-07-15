@@ -4,7 +4,7 @@ import os
 """
 Database configuration
 
-This script handles the configuration variables required for connecting to the database and other sensitive settings.
+This script that handles the configuration variables required for connecting to the database and other sensitive settings.
 
 Variables:
 - DB_USERNAME (str): The username for database authentication.
