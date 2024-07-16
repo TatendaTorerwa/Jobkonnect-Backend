@@ -27,7 +27,7 @@ class User(Base):
     address = Column(String(255), nullable=True)
     company_name = Column(String(100), nullable=True)
     website = Column(String(255), nullable=True)
-    contact_infor = Column(String(255), nullable=True)
+    contact_info = Column(String(255), nullable=True)
 
     jobs = relationship('Job', back_populates='employer', foreign_keys='Job.employer_id')
     applications = relationship('Application', back_populates='user', foreign_keys='Application.user_id')
@@ -48,7 +48,7 @@ class User(Base):
             "address": self.address,
             "company_name": self.company_name if self.role == 'employer' else None,
             "website": self.website if self.role == 'employer' else None,
-            "contact_infor": self.contact_infor if self.role == 'employer' else None
+            "contact_info": self.contact_info if self.role == 'employer' else None
         }
 
     def validate_role_specific_fields(self):
@@ -59,7 +59,7 @@ class User(Base):
                 raise ValueError("Job seekers must have a first name and last name.")
             self.company_name = None
             self.website = None
-            self.contact_infor = None
+            self.contact_info = None
         elif self.role == 'employer':
             if not self.company_name or not self.website:
                 raise ValueError("Employers must have a company name and website.")

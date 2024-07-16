@@ -64,7 +64,7 @@ def register():
     last_name = data.get('last_name', None)
     company_name = data.get('company_name', None)
     website = data.get('website', None)
-    contact_infor= data.get('contact_infor', None)
+    contact_info= data.get('contact_infor', None)
 
     """Validate required fields"""     
     if not username or not password or not email or not role or not phone_number:

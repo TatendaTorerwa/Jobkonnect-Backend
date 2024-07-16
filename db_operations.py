@@ -72,7 +72,7 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 """user database operations"""
 
 def register_user(username, password, email, role, phone_number, address,
-                 first_name=None, last_name=None, company_name=None, website=None, contact_infor=None):
+                 first_name=None, last_name=None, company_name=None, website=None, contact_info=None):
     """
     Register a new user in the database.
 
@@ -87,7 +87,7 @@ def register_user(username, password, email, role, phone_number, address,
     - first_name(str): The name of the job_seeker.
     - last_name(str): The last name of the job_seeker.
     - website(str): The website of the employer.
-    - contact_infor(str): The contact details of the employer.
+    - contact_info(str): The contact details of the employer.
 
     Returns:
     - None
@@ -109,7 +109,7 @@ def register_user(username, password, email, role, phone_number, address,
         last_name=last_name,
         company_name=company_name,
         website=website,
-        contact_infor=contact_infor
+        contact_info=contact_infor
     )
 
     """Validate role-specific fields."""
