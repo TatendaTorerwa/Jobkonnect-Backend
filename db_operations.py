@@ -109,7 +109,7 @@ def register_user(username, password, email, role, phone_number, address,
         last_name=last_name,
         company_name=company_name,
         website=website,
-        contact_info=contact_infor
+        contact_info=contact_info
     )
 
     """Validate role-specific fields."""
@@ -330,7 +330,7 @@ def update_job(job_id, data):
 
 def delete_job(job_id):
     """
-    Delete a job from the database.
+    Delete a job from the database along with any related applications.
 
     Args:
         job_id (int): The ID of the job to delete.
@@ -342,6 +342,11 @@ def delete_job(job_id):
         session = SessionLocal()
         job = session.query(Job).get(job_id)
         if job:
+            """Delete related applications if necessary"""
+            related_applications = session.query(Application).filter(Application.job_id == job_id).all()
+            for application in related_applications:
+                session.delete(application)
+            
             session.delete(job)
             session.commit()
             return True
@@ -352,6 +357,8 @@ def delete_job(job_id):
         session.rollback()
         print(f"Error deleting job {job_id}: {str(e)}")
         return False
+    finally:
+        session.close()
 
 
 """Application endpoints."""
@@ -451,16 +458,24 @@ def update_application_status(application_id, data):
     - data (dict): A dictionary containing the updated status.
 
     Returns:
-    - Application: The updated Application object if successful, None if application not found.
+    - dict: The updated Application object as a dictionary if successful, None if application not found.
     """
-    application = get_application_by_id(application_id)
-    if not application:
-        return None
-    if 'status' in data:
-        application.status = data['status']
     session = SessionLocal()
-    session.commit()
-    return application
+    try:
+        application = session.query(Application).get(application_id)
+        if not application:
+            return None
+        if 'status' in data:
+            application.status = data['status']
+        session.commit()
+        application_dict = application.to_dict()  # Convert to dictionary before closing session
+        return application_dict
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Error updating application {application_id}: {str(e)}")
+        return None
+    finally:
+        session.close()
 
 
 def delete_application(application_id):

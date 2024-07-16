@@ -81,7 +81,7 @@ def register():
         """Call register_user function to add user to database."""
         register_user(username, password, email, role, phone_number, address,
                       first_name=first_name, last_name=last_name,
-                      company_name=company_name, website=website, contact_infor=contact_infor)
+                      company_name=company_name, website=website, contact_info=contact_info)
     
         return jsonify({'message': 'User registered successfully'}), 201
 
@@ -436,9 +436,9 @@ def update_application_status_endpoint(current_user, id):
     if current_user['role'] != 'employer':
         return jsonify({"error": "Only employers can update applications"}), 403
 
-    data = request.json
-    application = update_application_status(id, data)
-    return jsonify(application.to_dict()) if application else jsonify({"error": "Application not found"}), 404
+    data = request.get_json()
+    application_dict = update_application_status(id, data)
+    return jsonify(application_dict) if application_dict else jsonify({"error": "Application not found"}), 404
 
 
 """Route to delete a specific application by ID."""
