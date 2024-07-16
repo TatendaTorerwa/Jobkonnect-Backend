@@ -9,12 +9,17 @@ from config import DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME
 """Determine the port or set a default port if not provided."""
 db_port = int(DB_PORT) if DB_PORT is not None else 3306
 
-
 """Database URL."""
 mysql_db_url = f"mysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
-"""Create database engine."""
-engine = create_engine(mysql_db_url)
+"""Create database engine with connection pool settings."""
+engine = create_engine(
+    mysql_db_url,
+    pool_size=20,         # Increase pool size
+    max_overflow=10,      # Increase overflow limit
+    pool_timeout=30,      # Increase timeout (optional)
+    pool_recycle=3600     # Recycle connections every hour (optional)
+)
 
 try:
     conn = engine.connect()
