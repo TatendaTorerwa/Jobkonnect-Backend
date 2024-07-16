@@ -20,7 +20,7 @@ class Application(Base):
     user_id = Column(Integer, ForeignKey('Users.id'), nullable=False)
     resume = Column(String(255))
     cover_letter = Column(String(255))
-    status = Column(Enum('submitted', 'under_review', 'rejected', 'accepted', name='status_enum'), default='submitted')
+    status = Column(Enum('submitted', 'under review', 'rejected', 'accepted', name='status_enum'), default='submitted')
     submitted_at = Column(TIMESTAMP, nullable=False, server_default=func.now())
     updated_at = Column(TIMESTAMP, nullable=False, server_default=func.now(), onupdate=func.now())
     years_of_experience = Column(Integer, nullable=True)
