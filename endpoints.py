@@ -459,7 +459,7 @@ def delete_application_endpoint(current_user, id):
         return jsonify({"error": "Only employers can delete applications"}), 403
 
     success = delete_application(id)
-    return jsonify({"message": "Application deleted"}) if success else jsonify({"error": "Application not found"}), 404
+    return jsonify({"message": "Application deleted"}) if success else jsonify({"error": "Application not found"}), 202
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)
