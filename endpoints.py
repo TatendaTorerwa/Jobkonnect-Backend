@@ -438,7 +438,11 @@ def update_application_status_endpoint(current_user, id):
 
     data = request.get_json()
     application_dict = update_application_status(id, data)
-    return jsonify(application_dict) if application_dict else jsonify({"error": "Application not found"}), 404
+    
+    if application_dict is not None:
+        return jsonify(application_dict), 200  # Return 200 OK on successful update
+    else:
+        return jsonify({"error": "Application not found"}), 404  # Return 404 Not Found if application not found
 
 
 """Route to delete a specific application by ID."""
