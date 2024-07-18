@@ -61,11 +61,11 @@ def token_required(f):
     def decorated(*args, **kwargs):
         auth_header = request.headers.get('Authorization')
         if not auth_header:
-            return jsonify({'message': 'Authorization header is missing!'}), 401
+            return jsonify({'error': 'Authorization header is missing!'}), 401
 
         parts = auth_header.split()
         if len(parts) != 2 or parts[0].lower() != 'bearer':
-            return jsonify({'message': 'Invalid token format!'}), 401
+            return jsonify({'error': 'Invalid token format!'}), 401
         
         token = parts[1]
 
@@ -77,9 +77,9 @@ def token_required(f):
                 'role': data['role']
             }
         except jwt.ExpiredSignatureError:
-            return jsonify({'message': 'Token has expired!'}), 401
+            return jsonify({'error': 'Token has expired!'}), 401
         except jwt.InvalidTokenError:
-            return jsonify({'message': 'Invalid token!'}), 401
+            return jsonify({'error': 'Invalid token!'}), 401
 
         return f(current_user, *args, **kwargs)
 
