@@ -74,29 +74,9 @@ Go to http://localhost:5000/
 - Use Postman to test the API endpoints.
 - Once you've completed these steps, the backend of DocBooking should be installed, configured, and ready to use both locally and in production.
 
-## API Endpoints
+## API Endpoints Overview (Postman)
 
-### User Authentication
-- POST /api/user/register - Register a new user
-- POST /api/user/login - Authenticate a user
-- GET /api/user/<int:id> - Get user details
-- POST /api/user/logout - Logout user
-
-### Job Listings
-- GET /api/jobs - Retrieve all job listings
-- POST /api/jobs - Create a new job listing
-- GET /api/jobs/<int:id> - Retrieve job details by ID
-- PUT /api/jobs/<int:id> - Update job listing by ID
-- DELETE /api/jobs/<int:id> - Delete job listing by ID
-
-### Job Applications
-- POST /api/jobs/<int:id>/apply - Apply to a job
-- POST /api/application - Create an application
-- GET /api/application - Retrieve all applications
-- GET /api/application/<int:id> - Retrieve one application by ID
-- PUT /api/application/<int:id> - Update application status by ID
-- DELETE /api/application/<int:id> - Delete an application
-
+https://documenter.getpostman.com/view/33810400/2sA3kUGh41
 
 ## Contributing
 - We welcome all contributions from the community to improve the JobKonnect_Backend. If you'd like to contribute, please follow these guidelines:
