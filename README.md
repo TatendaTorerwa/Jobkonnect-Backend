@@ -10,9 +10,9 @@
 ## Technologies
 
 ### Backend
-- Flask
-- Flask-Session (for session-based authentication)
-- Authentication: Token-based authentication managed by Flask-Session.
+- Python Programming Language
+- Flask Framework for mananging API request
+- Authentication: Token-based authentication managed by JWT
 
 
 ### Database
