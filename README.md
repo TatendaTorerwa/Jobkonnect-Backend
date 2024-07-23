@@ -31,6 +31,8 @@
 - Git
 
 ###Links
+http://tatenda1998.pythonanywhere.com/ - Backend
+https://jobkonnect-frontend.vercel.app/ - Frontend
 
 ### Installation
 1. Clone the repository:
